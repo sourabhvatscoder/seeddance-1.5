@@ -50,6 +50,34 @@ Route::get('/dashboard', function (Request $request) {
     return view('dashboard');
 })->name('dashboard');
 
+Route::get('/home', function (Request $request) {
+    if (! $request->session()->get('is_logged_in')) {
+        return redirect()->route('login');
+    }
+
+    return view('home');
+})->name('home');
+
+Route::post('/home/prompt', function (Request $request) {
+    if (! $request->session()->get('is_logged_in')) {
+        return redirect()->route('login');
+    }
+
+    $request->validate([
+        'prompt' => ['required', 'string'],
+    ]);
+
+    return back()->with('status', 'Prompt submitted.');
+})->name('home.prompt.submit');
+
+Route::get('/prompts', function (Request $request) {
+    if (! $request->session()->get('is_logged_in')) {
+        return redirect()->route('login');
+    }
+
+    return view('prompts');
+})->name('prompts');
+
 Route::post('/logout', function (Request $request) {
     $request->session()->invalidate();
     $request->session()->regenerateToken();

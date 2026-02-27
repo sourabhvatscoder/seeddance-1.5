@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
-@section('title', 'Dashboard')
+@section('title', 'Prompts')
 
 @section('content')
-    <h1>Dashboard</h1>
+    <h1>Prompts</h1>
 @endsection
