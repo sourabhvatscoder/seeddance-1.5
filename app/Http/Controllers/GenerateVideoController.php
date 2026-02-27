@@ -9,6 +9,7 @@ class GenerateVideoController extends Controller
 {
     public function __invoke(GenerateVideoRequest $request): JsonResponse
     {
+        
         return response()->json([
             'message' => 'Temporary debug response.',
             'payload' => $request->validated(),
