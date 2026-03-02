@@ -33,8 +33,8 @@ return [
 
     'seedance' => [
         'api_key' => env('SEEDANCE_API_KEY'),
-        'base_url' => env('SEEDANCE_BASE_URL', 'https://api.seedance.com'),
-        'generate_video_path' => env('SEEDANCE_GENERATE_VIDEO_PATH', '/v1/generate-video'),
+        'base_url' => env('SEEDANCE_BASE_URL', 'https://ark.ap-southeast.bytepluses.com/api'),
+        'generate_video_path' => env('SEEDANCE_GENERATE_VIDEO_PATH', '/v3/contents/generations/tasks'),
         'timeout_seconds' => (int) env('SEEDANCE_TIMEOUT_SECONDS', 30),
         'retry_attempts' => (int) env('SEEDANCE_RETRY_ATTEMPTS', 3),
         'retry_sleep_ms' => (int) env('SEEDANCE_RETRY_SLEEP_MS', 500),

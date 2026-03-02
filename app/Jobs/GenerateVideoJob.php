@@ -16,7 +16,9 @@ class GenerateVideoJob implements ShouldQueue
     {
     }
 
-    public function handle(): void
+    public function handle(\App\Services\SeedanceService $service): void
     {
+        // poll the Seedance API until the video is ready or an error occurs
+        $service->getVideoStatus((string) $this->videoGenerationId);
     }
 }
