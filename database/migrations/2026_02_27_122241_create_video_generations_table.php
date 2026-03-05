@@ -19,6 +19,8 @@ return new class extends Migration
 
             $table->string('external_job_id')->nullable()->index();
 
+            $table->string('seeddance_video_id')->nullable()->index();
+
             $table->text('video_url')->nullable();
 
             $table->text('error_message')->nullable();

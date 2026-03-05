@@ -5,6 +5,7 @@ namespace App\Services;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Client\RequestException;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 
 class SeedanceService
 {
@@ -64,6 +65,15 @@ class SeedanceService
                 ->post($baseUrl . $path, $requestPayload)
                 ->throw();
 
+            Log::build([
+                'driver' => 'single',
+                'path' => storage_path('logs/seedance_api.log'),
+            ])->info('Generate Video API Response', [
+                'payload' => $requestPayload,
+                'status' => $response->status(),
+                'body' => $response->json(),
+            ]);
+            
             return [
                 'success' => true,
                 'status' => $response->status(),
@@ -117,7 +127,7 @@ class SeedanceService
             // Return URL if successful
             if ($status === 'succeeded' && !empty($body['content']['video_url'])) {
                 $videoUrl = $body['content']['video_url'];
-                
+
                 \App\Models\VideoGeneration::where('seeddance_video_id', $videoId)
                     ->update(['video_url' => $videoUrl, 'status' => 'success']);
 
@@ -127,7 +137,7 @@ class SeedanceService
             // Handle API-side errors
             if ($status === 'error' || isset($body['error'])) {
                 $errorMsg = $body['error']['message'] ?? 'unknown error';
-                
+
                 \App\Models\VideoGeneration::where('seeddance_video_id', $videoId)
                     ->update(['status' => 'error', 'error_message' => $errorMsg]);
 
@@ -136,9 +146,22 @@ class SeedanceService
 
             // Return null for 'processing' or any other intermediate status
             return null;
-
         } catch (\Exception $exception) {
             return null;
         }
+    }
+
+    public function getAccountBalance()
+    {
+        // TODO: Replace this with your actual BytePlus/ByteDance API call
+        // Typically it looks something like this:
+        // $response = Http::withToken($this->apiKey)
+        //      ->get('https://ark.ap-southeast.bytepluses.com/api/v3/usage'); // Or the specific billing endpoint
+        // 
+        // if ($response->successful()) {
+        //     return $response->json('data.remaining_tokens');
+        // }
+
+        return 150000; // Placeholder: Return a fake number until you plug in the exact endpoint
     }
 }

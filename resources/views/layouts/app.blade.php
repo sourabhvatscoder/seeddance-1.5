@@ -131,7 +131,7 @@
             <p class="brand">Menu</p>
             <a class="link {{ request()->routeIs('home') ? 'active' : '' }}" href="{{ route('home') }}">Home</a>
             <a class="link {{ request()->routeIs('prompts') ? 'active' : '' }}" href="{{ route('prompts') }}">Prompts</a>
-
+            <a class="link {{ request()->routeIs('history') ? 'active' : '' }}" href="{{ route('history') }}">History</a>
             <form class="logout-form" method="POST" action="{{ route('logout') }}">
                 @csrf
                 <button class="logout-btn" type="submit">Logout</button>

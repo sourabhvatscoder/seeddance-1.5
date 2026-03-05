@@ -1,5 +1,6 @@
 <?php
 
+use App\Services\SeedanceService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -55,7 +56,11 @@ Route::get('/home', function (Request $request) {
         return redirect()->route('login');
     }
 
-    return view('home');
+    // Get basic stats
+    $totalVideos = \App\Models\VideoGeneration::count();
+    $processingVideos = \App\Models\VideoGeneration::where('status', 'processing')->count();
+    
+    return view('home', compact('totalVideos', 'processingVideos'));
 })->name('home');
 
 Route::post('/home/prompt', function (Request $request) {
@@ -75,8 +80,24 @@ Route::get('/prompts', function (Request $request) {
         return redirect()->route('login');
     }
 
-    return view('prompts');
+    // Fetch only saved prompts, paginated
+    $prompts = \App\Models\VideoGeneration::where('is_saved', true)
+                ->orderBy('created_at', 'desc')
+                ->paginate(10);
+
+    return view('prompts', compact('prompts'));
 })->name('prompts');
+
+Route::get('/history', function (Request $request) {
+    if (! $request->session()->get('is_logged_in')) {
+        return redirect()->route('login');
+    }
+
+    // Fetch the video generation history, ordered by newest first, 10 items per page
+    $history = \App\Models\VideoGeneration::orderBy('created_at', 'desc')->paginate(10);
+
+    return view('history', compact('history'));
+})->name('history');
 
 Route::post('/logout', function (Request $request) {
     $request->session()->invalidate();
@@ -84,3 +105,4 @@ Route::post('/logout', function (Request $request) {
 
     return redirect()->route('login');
 })->name('logout');
+

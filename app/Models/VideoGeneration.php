@@ -16,5 +16,6 @@ class VideoGeneration extends Model
         'seeddance_video_id',
         'video_url',
         'error_message',
+        'is_saved', 
     ];
 }
