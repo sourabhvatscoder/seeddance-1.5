@@ -13,12 +13,12 @@ class GenerateVideoController extends Controller
     public function __invoke(GenerateVideoRequest $request, SeedanceService $seedanceService): JsonResponse
     {
         $seedanceResponse = $seedanceService->generateVideo([
-            'prompt' => $request->validated('prompt'),
-            // 'image_url' => 'https://ark-doc.tos-ap-southeast-1.bytepluses.com/doc_image/i2v_foxrgirl.png',
-            // 'generate_audio' => true,
-            'ratio' => '16:9',
-            'duration' => 4,
-            'watermark' => false,
+            'prompt'         => $request->validated('prompt'),
+            'generate_audio' => $request->validated('generate_audio'),
+            'ratio'          => $request->validated('ratio'),
+            'resolution'     => $request->validated('resolution'),
+            'duration'       => $request->validated('duration'),
+            'watermark'      => false,
         ]);
 
         $videoGeneration = VideoGeneration::create([

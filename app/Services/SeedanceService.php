@@ -29,6 +29,11 @@ class SeedanceService
         $path = '/' . ltrim((string) config('services.seedance.generate_video_path'), '/');
 
         $textPrompt = (string) ($payload['prompt'] ?? '');
+        $generate_audio = (bool) ($payload['generate_audio'] ?? true);
+        $ratio = (string) ($payload['ratio'] ?? '16:9');
+        $resolution = (int) ($payload['resolution'] ?? 720);
+        $duration = (int) ($payload['duration'] ?? 4);
+        $watermark = (bool) ($payload['watermark'] ?? false);
         $imageUrl = $payload['image_url'] ?? null;
 
         $requestPayload = [
@@ -47,10 +52,11 @@ class SeedanceService
                     ]
                     : null,
             ])),
-            'generate_audio' => (bool) ($payload['generate_audio'] ?? true),
-            'ratio' => (string) ($payload['ratio'] ?? 'adaptive'),
-            'duration' => (int) ($payload['duration'] ?? 4),
-            'watermark' => (bool) ($payload['watermark'] ?? false),
+            'generate_audio' => $generate_audio,
+            'ratio' => $ratio,
+            'resolution' => $resolution,
+            'duration' => $duration,
+            'watermark' => $watermark,
         ];
 
         try {

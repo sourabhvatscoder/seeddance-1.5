@@ -84,7 +84,53 @@
                 <label class="prompt-label" for="prompt">Enter prompt</label>
                 <textarea class="prompt-input" id="prompt" name="prompt" required></textarea>
 
-                <button class="prompt-submit" type="submit">Submit</button>
+                <div style="display: flex; gap: 15px; margin-top: 15px;">
+                    <div>
+                        <label class="prompt-label" for="generate_audio">Include Sound?</label>
+                        <select class="prompt-input" id="generate_audio" style="min-height: 40px; padding: 8px;">
+                            <option value="1">Yes</option>
+                            <option value="0" selected>No</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="prompt-label" for="ratio">Aspect Ratio</label>
+                        <select class="prompt-input" id="ratio" style="min-height: 40px; padding: 8px;">
+                            <option value="21:9">21:9</option>
+                            <option value="16:9" selected>16:9</option>
+                            <option value="4:3">4:3</option>
+                            <option value="1:1">1:1</option>
+                            <option value="3:4">3:4</option>
+                            <option value="9:16">9:16</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="prompt-label" for="resolution">Resolution</label>
+                        <select class="prompt-input" id="resolution" style="min-height: 40px; padding: 8px;">
+                            <option value="480" selected>480p</option>
+                            <option value="720">720p</option>
+                            <option value="1080">1080p</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="prompt-label" for="duration">Duration (Seconds)</label>
+                        <select class="prompt-input" id="duration" style="min-height: 40px; padding: 8px;">
+                            <option value="4" selected>4</option>
+                            <option value="5">5</option>
+                            <option value="6">6</option>
+                            <option value="7">7</option>
+                            <option value="8">8</option>
+                            <option value="9">9</option>
+                            <option value="10">10</option>
+                            <option value="11">11</option>
+                            <option value="12">12</option>
+                        </select>
+                    </div>
+                </div>
+
+                <button class="prompt-submit" type="submit" style="margin-top: 20px;">Submit</button>
             </form>
             <!-- Video Player -->
             <div id="loading-area" style="display: none; background: #f9fafb; padding: 40px 24px; border-radius: 12px; border: 1px dashed var(--border); text-align: center; margin-top: 20px;">
@@ -99,7 +145,7 @@
                     }
                 </style>
             </div>
-            <div id="result-area" style="display: ; background: #ffffff; padding: 24px; border-radius: 12px; border: 1px solid var(--border); margin-top: 20px; box-shadow: var(--shadow);">
+            <div id="result-area" style="display: none; background: #ffffff; padding: 24px; border-radius: 12px; border: 1px solid var(--border); margin-top: 20px; box-shadow: var(--shadow);">
                 <h3 style="margin: 0 0 15px 0; color: var(--text);">Success! Here is your video:</h3>
 
                 <video id="result-video" controls autoplay style="width: 100%; border-radius: 8px; background: #000; margin-bottom: 20px;"></video>
@@ -151,6 +197,10 @@
 
         const payload = {
             prompt: promptInput.value.trim(),
+            generate_audio: document.getElementById('generate_audio').value === '1', // converts to boolean
+            ratio: document.getElementById('ratio').value,
+            resolution: parseInt(document.getElementById('resolution').value),
+            duration: parseInt(document.getElementById('duration').value),
         };
 
         if (!payload.prompt) {
