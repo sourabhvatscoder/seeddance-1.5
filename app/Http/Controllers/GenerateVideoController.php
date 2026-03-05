@@ -6,6 +6,7 @@ use App\Http\Requests\GenerateVideoRequest;
 use App\Models\VideoGeneration;
 use App\Services\SeedanceService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 class GenerateVideoController extends Controller
 {
@@ -58,7 +59,7 @@ class GenerateVideoController extends Controller
                 'success' => false,
                 'status' => 'error',
                 'message' => $record->error_message ?? 'An unknown error occurred.',
-            ], 400); 
+            ], 400);
         }
 
         // Otherwise, it's still processing
@@ -67,5 +68,28 @@ class GenerateVideoController extends Controller
             'status' => 'processing',
             'message' => 'Video is still being generated. Please wait.',
         ], 200); // 200 OK (or 202 Accepted)
+    }
+
+    public function savePrompt(Request $request, $id): JsonResponse
+    {
+        // You can query by the database ID or the seeddance_video_id
+        $video = VideoGeneration::where('id', $id)
+            ->orWhere('seeddance_video_id', $id)
+            ->first();
+
+        if (!$video) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Video record not found.',
+            ], 404);
+        }
+
+        // Update the is_saved column
+        $video->update(['is_saved' => true]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Prompt saved successfully.',
+        ], 200);
     }
 }

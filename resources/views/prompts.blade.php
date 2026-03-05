@@ -36,12 +36,7 @@
                             @endif
                         </td>
                         <td style="padding: 14px 16px; text-align: center;">
-                            <form action="{{ route('video.toggle-save', $item->id) }}" method="POST">
-                                @csrf
-                                <button type="submit" style="background: none; border: none; color: var(--danger); cursor: pointer; font-size: 1.1rem;" title="Remove from saved">
-                                    ♥
-                                </button>
-                            </form>
+                            
                         </td>
                     </tr>
                 @empty

@@ -99,7 +99,7 @@
                     }
                 </style>
             </div>
-            <div id="result-area" style="display: none; background: #ffffff; padding: 24px; border-radius: 12px; border: 1px solid var(--border); margin-top: 20px; box-shadow: var(--shadow);">
+            <div id="result-area" style="display: ; background: #ffffff; padding: 24px; border-radius: 12px; border: 1px solid var(--border); margin-top: 20px; box-shadow: var(--shadow);">
                 <h3 style="margin: 0 0 15px 0; color: var(--text);">Success! Here is your video:</h3>
 
                 <video id="result-video" controls autoplay style="width: 100%; border-radius: 8px; background: #000; margin-bottom: 20px;"></video>
@@ -108,13 +108,9 @@
                     <a id="download-btn" href="#" download="generated-video.mp4" target="_blank" style="flex: 1; display: inline-block; text-align: center; background: #10b981; color: white; text-decoration: none; padding: 10px 16px; border-radius: 8px; font-weight: 600;">
                         ↓ Download Video
                     </a>
-
-                    <form id="save-form" method="POST" action="" style="flex: 1;">
-                        @csrf
-                        <button type="submit" style="width: 100%; background: var(--primary-soft); color: var(--primary); border: 1px solid #c7d2fe; padding: 10px 16px; border-radius: 8px; font-weight: 600; cursor: pointer;">
-                            ♥ Save to Prompts
-                        </button>
-                    </form>
+                    <a id="save-prompt-btn" href="#" data-id="VIDEO_ID_HERE" style="flex: 1; display: inline-block; text-align: center; background: var(--primary); color: white; text-decoration: none; padding: 10px 16px; border-radius: 8px; font-weight: 600;">
+                        ♥ Save to Prompts
+                    </a>
                 </div>
             </div>
         </section>
@@ -148,6 +144,7 @@
     const resultVideo = document.getElementById('result-video');
     const downloadBtn = document.getElementById('download-btn');
     const saveForm = document.getElementById('save-form');
+    const savePromptBtn = document.getElementById('save-prompt-btn');
 
     promptForm.addEventListener('submit', async function(event) {
         event.preventDefault();
@@ -196,6 +193,44 @@
         }
     });
 
+    if (savePromptBtn) {
+        savePromptBtn.addEventListener('click', function() {
+            const btn = this;
+            const videoId = btn.getAttribute('data-id');
+
+            // Disable button and update text to show processing state
+            btn.disabled = true;
+            btn.innerText = 'Saving...';
+
+            // Call the newly created API
+            fetch(`/api/save-prompt/${videoId}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Update UI on success without page reload
+                        btn.innerText = 'Saved!';
+                    } else {
+                        alert(data.message || 'Failed to save prompt.');
+                        // Re-enable button on failure
+                        btn.disabled = false;
+                        btn.innerText = 'Save to Prompts';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('An error occurred while saving.');
+                    btn.disabled = false;
+                    btn.innerText = 'Save to Prompts';
+                });
+        });
+    }
+
     async function fetchVideoStatus(videoId) {
         try {
             submitButton.disabled = true;
@@ -213,8 +248,9 @@
                 resultArea.style.display = 'block';
                 resultVideo.src = data.video_url;
                 downloadBtn.href = data.video_url;
-                saveForm.action = `/save-prompt/${videoId}`;
                 resultVideo.load();
+                // Update save button data-id for later use
+                savePromptBtn.setAttribute('data-id', videoId);
             } else if (data.status === 'processing') {
                 console.log('Still processing... checking again in 5 seconds.');
                 setTimeout(() => fetchVideoStatus(videoId), 2000);
