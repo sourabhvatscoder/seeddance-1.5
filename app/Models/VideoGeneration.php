@@ -13,6 +13,7 @@ class VideoGeneration extends Model
         'prompt_text',
         'status',
         'external_job_id',
+        'seeddance_video_id',
         'video_url',
         'error_message',
     ];

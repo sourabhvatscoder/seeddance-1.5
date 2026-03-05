@@ -20,4 +20,4 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 Route::post('/generate-video', GenerateVideoController::class);
-Route::get('/get-video-status/{id}', [GenerateVideoController::class, 'getStatus']);
+Route::get('/get-video-status/{id}', [GenerateVideoController::class, 'checkVideoStatus']);

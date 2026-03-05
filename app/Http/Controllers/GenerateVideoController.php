@@ -11,12 +11,11 @@ class GenerateVideoController extends Controller
 {
     public function __invoke(GenerateVideoRequest $request, SeedanceService $seedanceService): JsonResponse
     {
-        
         $seedanceResponse = $seedanceService->generateVideo([
-            'prompt' => 'A girl holding a fox, the girl opens her eyes, looks gently at the camera, the fox hugs affectionately, the camera slowly pulls out, the girl’s hair is blown by the wind, and the sound of the wind can be heard',
-            'image_url' => 'https://ark-doc.tos-ap-southeast-1.bytepluses.com/doc_image/i2v_foxrgirl.png',
-            'generate_audio' => true,
-            'ratio' => 'adaptive',
+            'prompt' => $request->validated('prompt'),
+            // 'image_url' => 'https://ark-doc.tos-ap-southeast-1.bytepluses.com/doc_image/i2v_foxrgirl.png',
+            // 'generate_audio' => true,
+            'ratio' => '16:9',
             'duration' => 4,
             'watermark' => false,
         ]);
@@ -31,20 +30,42 @@ class GenerateVideoController extends Controller
         return response()->json([
             'message' => 'Video generation request accepted.',
             'id' => $videoGeneration->id,
+            'seeddance_video_id' => $seedanceResponse['data']['id'] ?? null,
             'status' => $videoGeneration->status,
         ], 202);
     }
 
-    public function getStatus(int $id, SeedanceService $seedanceService): JsonResponse
+    public function checkVideoStatus(string $videoId, SeedanceService $seedanceService): JsonResponse
     {
-        $videoGeneration = VideoGeneration::findOrFail($id);
-        $videoStatus = $seedanceService->getVideoStatus($videoGeneration->seeddance_video_id);
+        $videoUrl = $seedanceService->getVideoStatus($videoId);
 
+        // If a URL is returned, generation is successful
+        if ($videoUrl !== null) {
+            return response()->json([
+                'success' => true,
+                'status' => 'success',
+                'video_url' => $videoUrl,
+            ], 200);
+        }
+
+        // Since the function returns null for both "processing" and "error",
+        // we check the database to tell the frontend exactly what's happening.
+        $record = VideoGeneration::where('seeddance_video_id', $videoId)->first();
+
+        // If the database status was updated to 'error'
+        if ($record && $record->status === 'error') {
+            return response()->json([
+                'success' => false,
+                'status' => 'error',
+                'message' => $record->error_message ?? 'An unknown error occurred.',
+            ], 400); 
+        }
+
+        // Otherwise, it's still processing
         return response()->json([
-            'id' => $videoGeneration->id,
-            'status' => $videoStatus['status'] ?? $videoGeneration->status,
-            'video_url' => $videoStatus['video_url'] ?? null,
-            'error_message' => $videoStatus['error'] ?? null,
-        ]);
+            'success' => true,
+            'status' => 'processing',
+            'message' => 'Video is still being generated. Please wait.',
+        ], 200); // 200 OK (or 202 Accepted)
     }
 }
